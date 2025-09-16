@@ -1,5 +1,5 @@
-module github.com/dennesshen/photon-openfeign-starter
+module github.com/Phofuture/photon-openfeign-starter
 
 go 1.23.0
 
-require github.com/dennesshen/photon-core-starter v1.0.3
+require github.com/Phofuture/photon-core-starter v0.0.0-20250916060707-12acf34d9318

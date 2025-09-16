@@ -8,22 +8,22 @@ import (
 	"net/url"
 	"reflect"
 	"strings"
-	
-	"github.com/dennesshen/photon-openfeign-starter/restTemplate"
+
+	"github.com/Phofuture/photon-openfeign-starter/restTemplate"
 )
 
 func StartOpenFeign(ctx context.Context) error {
 	for _, feignClient := range GetFeignClients() {
 		fcType := reflect.TypeOf(feignClient).Elem()
 		fcValue := reflect.ValueOf(feignClient).Elem()
-		
+
 		for i := range fcType.NumField() {
 			field := fcType.Field(i)
 			valueField := fcValue.Field(i)
 			if field.Type.Kind() != reflect.Func {
 				continue
 			}
-			
+
 			apiPath := field.Tag.Get("path")
 			if apiPath == "" {
 				continue
@@ -32,16 +32,16 @@ func StartOpenFeign(ctx context.Context) error {
 			if method == "" {
 				continue
 			}
-			
+
 			newFunc := reflect.MakeFunc(field.Type, func(args []reflect.Value) []reflect.Value {
 				var err error
 				executor := restTemplate.NewExecutor()
-				
+
 				fullUrl, err := assembleUrl(feignClient.Domain(), apiPath)
 				if err != nil {
 					return setErrorValue(&field, err)
 				}
-				
+
 				err = dealInputArgs(args, fullUrl, executor)
 				if err != nil {
 					return setErrorValue(&field, err)
@@ -51,14 +51,14 @@ func StartOpenFeign(ctx context.Context) error {
 				if err != nil {
 					return setErrorValue(&field, err)
 				}
-				
+
 				return setOutValue(&field, &response, err)
 			})
 			valueField.Set(newFunc)
 		}
-		
+
 	}
-	
+
 	return nil
 }
 
@@ -86,18 +86,18 @@ func dealInputArgs(args []reflect.Value, fullUrl *url.URL, executor *restTemplat
 			pv := value.Interface().(PathVariable) //nolint:errcheck
 			fullUrl, err = replacePathVariables(fullUrl, pv)
 		}
-		
+
 		if err != nil {
 			return
 		}
 	}
-	
+
 	// 檢查 URL 是否合法
 	if fullUrl.Scheme != "http" && fullUrl.Scheme != "https" {
 		return fmt.Errorf("invalid url: %s", fullUrl.String())
 	}
 	executor.SetUrl(fullUrl.String())
-	
+
 	return
 }
 
@@ -109,7 +109,7 @@ func replacePathVariables(fullUrl *url.URL, variables map[string]string) (*url.U
 		placeholder := "{" + key + "}"
 		path = strings.Replace(path, placeholder, value, -1)
 	}
-	
+
 	// 返回替換後的完整路徑
 	parseUrl, err := fullUrl.Parse(path)
 	if err != nil {
@@ -142,7 +142,7 @@ func setErrorValue(field *reflect.StructField, err error) []reflect.Value {
 
 func setOutValue(field *reflect.StructField, response *restTemplate.RawResponse, err error) []reflect.Value {
 	returnValues := make([]reflect.Value, field.Type.NumOut())
-	
+
 	outErrIndex := 0
 	for i := 0; i < field.Type.NumOut(); i++ {
 		outType := field.Type.Out(i)
@@ -171,6 +171,6 @@ func setOutValue(field *reflect.StructField, response *restTemplate.RawResponse,
 	} else {
 		returnValues[outErrIndex] = reflect.Zero(reflect.TypeOf((*error)(nil)).Elem())
 	}
-	
+
 	return returnValues
 }

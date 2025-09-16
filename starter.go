@@ -1,8 +1,8 @@
 package openFiegnStarter
 
 import (
-	"github.com/dennesshen/photon-core-starter/core"
-	"github.com/dennesshen/photon-openfeign-starter/openfeign"
+	"github.com/Phofuture/photon-core-starter/core"
+	"github.com/Phofuture/photon-openfeign-starter/openfeign"
 )
 
 func init() {

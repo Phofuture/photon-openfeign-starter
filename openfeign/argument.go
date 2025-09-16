@@ -8,8 +8,8 @@ import (
 	"mime/multipart"
 	"net/url"
 	"os"
-	
-	"github.com/dennesshen/photon-core-starter/utils/structure"
+
+	"github.com/Phofuture/photon-core-starter/utils/structure"
 )
 
 type RequestBody interface {
@@ -69,14 +69,14 @@ func (mpb *MultiPartBody) Encode() ([]byte, error) {
 			return nil, err
 		}
 	}
-	
+
 	if mpb.filePart.file != nil {
 		// 創建表單文件字段
 		part, err := writer.CreateFormFile(mpb.filePart.fieldName, mpb.filePart.file.Name())
 		if err != nil {
 			return nil, err
 		}
-		
+
 		// 將文件內容寫入到 multipart 表單中
 		_, err = io.Copy(part, mpb.filePart.file)
 		if err != nil {
