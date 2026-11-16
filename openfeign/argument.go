@@ -117,6 +117,23 @@ func (fbd *FormDataBody) Encode() ([]byte, error) {
 	return []byte(fbd.keyValues.Encode()), nil
 }
 
+type StringBody struct {
+	data string
+}
+
+func (sb *StringBody) AddData(data string) *StringBody {
+	sb.data = data
+	return sb
+}
+
+func (sb *StringBody) ContentType() string {
+	return "text/plain"
+}
+
+func (sb *StringBody) Encode() ([]byte, error) {
+	return []byte(sb.data), nil
+}
+
 type RequestHeaders map[string][]string
 
 func (rh RequestHeaders) AddHeader(key string, values ...string) RequestHeaders {
